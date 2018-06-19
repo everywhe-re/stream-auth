@@ -74,6 +74,13 @@ router.get('/stream/auth', async (ctx, next) => {
         return;
     }
 
+    // User is banned
+    if (user.banned) {
+        ctx.status = 403;
+        ctx.body = { status: 'banned' };
+        return;
+    }
+
     // Invalid stream name
     if (user.userName !== query.name) {
         ctx.status = 403;
