@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "userName": "leNic",
+      "email": "lenic@everywhe.re",
+      "passwordHash": "$argon2i$v=19$m=4096,t=3,p=1$KQ1dsrmAE9VYyfmFUqeWjw$fuS41r5Ks7UcAxP4NfZ6HTNI6HcpxXBERA3UOYTKuHE",
+      "streamKey": "cc23572c2456fb6b3ef0bd402755304ed2af5787dd8f26fe31bc1a35c1761e501ef7959379fb1596abeab52e5833f52daec91a450071abc2bb5139601205d224"
+    }
+  ]
+}

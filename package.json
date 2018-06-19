@@ -1,0 +1,21 @@
+{
+  "name": "everywhe-re-auth",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "author": "leNicDev",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "node src/app.js",
+    "start:watch": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "argon2": "^0.19.3",
+    "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "lowdb": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.5"
+  }
+}
