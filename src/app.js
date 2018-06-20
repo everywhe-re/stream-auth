@@ -129,6 +129,8 @@ router.get('/play/auth', async (ctx, next) => {
     const query = ctx.request.query;
 
     console.log('/play/auth - Query: ' + JSON.stringify(query));
+
+    next();
 });
 
 
