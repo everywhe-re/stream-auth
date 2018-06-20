@@ -3,6 +3,7 @@ const Router = require('koa-router');
 const argon2 = require('argon2');
 const db = require('./database/lowdb');
 const streamKeyUtils = require('./util/streamkey.utils');
+const jwtService = require('./service/jwt.service');
 
 const app = new Koa();
 
@@ -55,11 +56,42 @@ router.post('/user/add', async (ctx, next) => {
     next();
 });
 
-router.get('/stream/auth', async (ctx, next) => {
+router.post('/auth', async (ctx, next) => {
+    // Get request body
+    const body = ctx.request.body;
+
+    // Get user by its email
+    const user = db.getUserByEmail(body.email);
+
+    // User not found
+    if (!user) {
+        ctx.status = 403;
+        ctx.body = { status: 'invalid_credentials' };
+        return;
+    }
+
+    // Verify password
+    const passwordValid = await argon2.verify(user.passwordHash, body.password);
+
+    // Invalid password
+    if (!passwordValid) {
+        ctx.status = 403;
+        ctx.body = { status: 'invalid_credentials' };
+        return;
+    }
+
+    // Sign JWT
+    const token = jwtService.createToken(user);
+
+    // Return signed token
+    ctx.body = { token };
+});
+
+router.get('/broadcast/auth', async (ctx, next) => {
     // Get parsed query string
     const query = ctx.request.query;
 
-    console.log('Query: ' + JSON.stringify(query));
+    console.log('/broadcast/auth - Query: ' + JSON.stringify(query));
 
     // Get stream key
     const streamKey = query.key;
@@ -90,6 +122,13 @@ router.get('/stream/auth', async (ctx, next) => {
 
     ctx.body = { status: 'success' };
     next();
+});
+
+router.get('/play/auth', async (ctx, next) => {
+    // Get parsed query string
+    const query = ctx.request.query;
+
+    console.log('/play/auth - Query: ' + JSON.stringify(query));
 });
 
 

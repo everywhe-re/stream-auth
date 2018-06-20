@@ -1,0 +1,7 @@
+{
+    "auth": {
+        "jwt": {
+            "secret": "Y6V2qwYk99G9rTRUVJGJ9LDkVcHpxAZfCENKmXVhFDutygFwUafnKuRfWFwvgzzm"
+        }
+    }
+}
