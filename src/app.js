@@ -11,7 +11,7 @@ const adminCredentials = require('../everywhe-re-firebase-adminsdk-0kb8d-31d063f
 const firebaseAdmin = require('firebase-admin');
 
 firebaseAdmin.initializeApp({
-    credential: admin.credential.cert(adminCredentials),
+    credential: firebaseAdmin.credential.cert(adminCredentials),
     databaseURL: 'https://everywhe-re.firebaseio.com'
 });
   
