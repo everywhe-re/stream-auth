@@ -9,9 +9,7 @@
     "start:watch": "nodemon src/app.js"
   },
   "dependencies": {
-    "argon2": "^0.19.3",
     "firebase-admin": "^5.12.1",
-    "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0"

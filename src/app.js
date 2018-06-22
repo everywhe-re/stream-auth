@@ -1,9 +1,5 @@
 const Koa = require('koa');
 const Router = require('koa-router');
-const argon2 = require('argon2');
-const db = require('./database/lowdb');
-const streamKeyUtils = require('./util/streamkey.utils');
-const jwtService = require('./service/jwt.service');
 
 const app = new Koa();
 
