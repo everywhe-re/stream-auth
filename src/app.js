@@ -30,16 +30,18 @@ router.get('/broadcast/auth', async (ctx, next) => {
     const streamKey = query.key;
 
     // Get user by it's stream key
-    const broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey);
+    let broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey);
 
     console.log('Broadcaster', broadcaster);
 
     // Invalid stream key
-    if (!broadcaster) {
+    if (!broadcaster || !broadcaster.exists) {
         ctx.status = 403;
         ctx.body = { status: 'invalid_stream_key' };
         return;
     }
+
+    broadcaster = broadcaster.data();
 
     // User is banned
     if (broadcaster.banned) {
