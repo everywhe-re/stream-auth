@@ -10,82 +10,19 @@ const app = new Koa();
 const bodyParser = require('koa-bodyparser');
 const router = new Router();
 
+// Firebase admin
+const adminCredentials = require('../everywhe-re-firebase-adminsdk-0kb8d-31d063f8a1.json');
+const firebaseAdmin = require('firebase-admin');
+
+firebaseAdmin.initializeApp({
+    credential: admin.credential.cert(adminCredentials),
+    databaseURL: 'https://everywhe-re.firebaseio.com'
+});
+  
+const firestore = firebaseAdmin.firestore();
+
 
 // Routes
-
-router.post('/user/add', async (ctx, next) => {
-    // Get request body
-    const body = ctx.request.body;
-
-    let user = db.getUserByEmail(body.email);
-
-    // The email is already in use
-    if (user) {
-        ctx.status = 409;
-        ctx.body = { status: 'credentials_in_use' };
-        return;
-    }
-
-    user = db.getUserByUserName(body.userName);
-
-    // The username is already in use
-    if (user) {
-        ctx.status = 409;
-        ctx.body = { status: 'credentials_in_use' };
-        return;
-    }
-
-    // Hash password
-    const passwordHash = await argon2.hash(body.password);
-
-    // Build user object
-    user = {
-        userName: body.userName,
-        email: body.email,
-        passwordHash: passwordHash,
-        banned: false
-    };
-
-    // Generate stream key
-    user.streamKey = streamKeyUtils.generateStreamKey(user);
-
-    // Save user to database
-    db.addUser(user);
-
-    ctx.body = user;
-    next();
-});
-
-router.post('/auth', async (ctx, next) => {
-    // Get request body
-    const body = ctx.request.body;
-
-    // Get user by its email
-    const user = db.getUserByEmail(body.email);
-
-    // User not found
-    if (!user) {
-        ctx.status = 403;
-        ctx.body = { status: 'invalid_credentials' };
-        return;
-    }
-
-    // Verify password
-    const passwordValid = await argon2.verify(user.passwordHash, body.password);
-
-    // Invalid password
-    if (!passwordValid) {
-        ctx.status = 403;
-        ctx.body = { status: 'invalid_credentials' };
-        return;
-    }
-
-    // Sign JWT
-    const token = jwtService.createToken(user);
-
-    // Return signed token
-    ctx.body = { token };
-});
 
 router.get('/broadcast/auth', async (ctx, next) => {
     // Get parsed query string
@@ -97,39 +34,30 @@ router.get('/broadcast/auth', async (ctx, next) => {
     const streamKey = query.key;
 
     // Get user by it's stream key
-    const user = db.getUserByStreamKey(streamKey);
+    const broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey);
 
     // Invalid stream key
-    if (!user) {
+    if (!broadcaster) {
         ctx.status = 403;
         ctx.body = { status: 'invalid_stream_key' };
         return;
     }
 
     // User is banned
-    if (user.banned) {
+    if (broadcaster.banned) {
         ctx.status = 403;
         ctx.body = { status: 'banned' };
         return;
     }
 
     // Invalid stream name
-    if (user.userName !== query.name) {
+    if (broadcaster.uid !== query.uid) {
         ctx.status = 403;
         ctx.body = { status: 'invalid_stream_name' };
         return;
     }
 
     ctx.body = { status: 'success' };
-    next();
-});
-
-router.get('/play/auth', async (ctx, next) => {
-    // Get parsed query string
-    const query = ctx.request.query;
-
-    console.log('/play/auth - Query: ' + JSON.stringify(query));
-
     next();
 });
 
