@@ -32,6 +32,8 @@ router.get('/broadcast/auth', async (ctx, next) => {
     // Get user by it's stream key
     const broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey);
 
+    console.log('Broadcaster', broadcaster);
+
     // Invalid stream key
     if (!broadcaster) {
         ctx.status = 403;
@@ -47,7 +49,7 @@ router.get('/broadcast/auth', async (ctx, next) => {
     }
 
     // Invalid stream name
-    if (broadcaster.uid !== query.uid) {
+    if (query.name !== broadcaster.uid) {
         ctx.status = 403;
         ctx.body = { status: 'invalid_stream_name' };
         return;
