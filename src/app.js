@@ -30,7 +30,7 @@ router.get('/broadcast/auth', async (ctx, next) => {
     const streamKey = query.key;
 
     // Get user by it's stream key
-    let broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey);
+    let broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey).get();
 
     // Invalid stream key
     if (!broadcaster || !broadcaster.exists) {
