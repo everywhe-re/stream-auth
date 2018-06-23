@@ -14,7 +14,7 @@ firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert(adminCredentials),
     databaseURL: 'https://everywhe-re.firebaseio.com'
 });
-  
+
 const firestore = firebaseAdmin.firestore();
 
 
@@ -30,35 +30,43 @@ router.get('/broadcast/auth', async (ctx, next) => {
     const streamKey = query.key;
 
     // Get user by it's stream key
-    let broadcaster = await firestore.collection('broadcasters').where('streamKey', '==', streamKey).get();
+    let broadcasters = await firestore.collection('broadcasters').where('streamKey', '==', streamKey).limit(1).get();
 
-    // Invalid stream key
-    if (!broadcaster || !broadcaster.exists) {
-        ctx.status = 403;
-        ctx.body = { status: 'invalid_stream_key' };
-        return;
-    }
+    broadcasters.forEach((broadcaster) => {
+        // Invalid stream key
+        if (!broadcaster || !broadcaster.exists) {
+            ctx.status = 403;
+            ctx.body = {
+                status: 'invalid_credentials'
+            };
+            return;
+        }
 
-    broadcaster = broadcaster.data();
+        broadcaster = broadcaster.data();
 
-    console.log('Broadcaster', broadcaster);
+        // User is banned
+        if (broadcaster.banned) {
+            ctx.status = 403;
+            ctx.body = {
+                status: 'banned'
+            };
+            return;
+        }
 
-    // User is banned
-    if (broadcaster.banned) {
-        ctx.status = 403;
-        ctx.body = { status: 'banned' };
-        return;
-    }
+        // Invalid stream name
+        if (query.name !== broadcaster.uid) {
+            ctx.status = 403;
+            ctx.body = {
+                status: 'invalid_credentials'
+            };
+            return;
+        }
 
-    // Invalid stream name
-    if (query.name !== broadcaster.uid) {
-        ctx.status = 403;
-        ctx.body = { status: 'invalid_stream_name' };
-        return;
-    }
-
-    ctx.body = { status: 'success' };
-    next();
+        ctx.body = {
+            status: 'success'
+        };
+        next();
+    });
 });
 
 
